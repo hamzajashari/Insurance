@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Claims.Migrations
+namespace Claims.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class InitialAuditMigration : Migration

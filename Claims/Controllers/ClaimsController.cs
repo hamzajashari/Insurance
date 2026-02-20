@@ -1,4 +1,5 @@
-using Claims.Auditing;
+using Claims.Domain;
+using Claims.Infrastructure.Auditing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.EntityFrameworkCore.Extensions;
@@ -73,7 +74,7 @@ namespace Claims.Controllers
             return await Claims.ToListAsync();
         }
 
-        public async Task<Claim> GetClaimAsync(string id)
+        public async Task<Claim> GetClaimAsync(string? id)
         {
             return await Claims
                 .Where(claim => claim.Id == id)

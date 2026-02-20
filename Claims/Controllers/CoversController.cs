@@ -1,4 +1,5 @@
-using Claims.Auditing;
+using Claims.Domain;
+using Claims.Infrastructure.Auditing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

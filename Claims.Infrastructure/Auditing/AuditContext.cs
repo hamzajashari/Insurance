@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Claims.Domain.Audit;
+using Microsoft.EntityFrameworkCore;
 
-namespace Claims.Auditing
+namespace Claims.Infrastructure.Auditing
 {
     public class AuditContext : DbContext
     {
