@@ -7,6 +7,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.6" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\Claims.Domain\Claims.Domain.csproj" />
 		<ProjectReference Include="..\Claims.Infrastructure\Claims.Infrastructure.csproj" />
 	</ItemGroup>

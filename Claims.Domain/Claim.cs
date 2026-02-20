@@ -3,6 +3,9 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Claims.Domain
 {
+    /// <summary>
+    /// Represents an insurance claim.
+    /// </summary>
     public class Claim
     {
         [BsonId]
@@ -23,7 +26,9 @@ namespace Claims.Domain
         [BsonElement("damageCost")]
         public decimal DamageCost { get; set; }
     }
-
+    /// <summary>
+    /// Defines available insurance cover types.
+    /// </summary>
     public enum ClaimType
     {
         Collision = 0,

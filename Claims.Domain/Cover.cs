@@ -2,6 +2,9 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Claims;
 
+/// <summary>
+/// Represents an insurance cover.
+/// </summary>
 public class Cover
 {
     [BsonId]
