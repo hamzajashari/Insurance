@@ -1,7 +1,7 @@
 ﻿using Claims.Domain.Audit;
 using Microsoft.EntityFrameworkCore;
 
-namespace Claims.Infrastructure.Auditing
+namespace Claims.Infrastructure.DbContexts
 {
     public class AuditContext : DbContext
     {
