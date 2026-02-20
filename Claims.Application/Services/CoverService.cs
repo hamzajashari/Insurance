@@ -14,6 +14,7 @@ namespace Claims.Application.Services
         private readonly IAuditService _auditService;
         private readonly ILogger<CoverService> _logger;
 
+        private const decimal BaseDayRate = 1250m;
         public CoverService(
             ClaimsContext claimsContext,
             IAuditService auditService,
@@ -49,7 +50,12 @@ namespace Claims.Application.Services
             cover.Id = Guid.NewGuid().ToString();
 
             // Business rule: calculate premium here
-            cover.Premium = ComputePremium(cover.StartDate, cover.EndDate, cover.Type);
+            var days = (cover.EndDate.Date - cover.StartDate.Date).Days;
+
+            if (days <= 0)
+                throw new ArgumentException("End date must be after start date.");
+
+            cover.Premium = ComputePremium(cover.Type, days);
 
             _claimsContext.Covers.Add(cover);
             await _claimsContext.SaveChangesAsync();
@@ -78,35 +84,45 @@ namespace Claims.Application.Services
         /// Calculates premium based on duration and cover type.
         /// Applies discounts after 30 and 180 days.
         /// </summary>
-        public decimal ComputePremium(DateTime startDate, DateTime endDate, CoverType coverType)
+        public decimal ComputePremium(CoverType coverType, int insuranceDays)
         {
-            var multiplier = coverType switch
+            if (insuranceDays <= 0)
+                throw new ArgumentException("Insurance period must be positive.");
+
+            decimal dailyRate = BaseDayRate * GetTypeMultiplier(coverType);
+
+            int firstPeriodDays = Math.Min(insuranceDays, 30);
+            int secondPeriodDays = Math.Min(Math.Max(insuranceDays - 30, 0), 150);
+            int thirdPeriodDays = Math.Max(insuranceDays - 180, 0);
+
+            decimal firstPeriodPremium = firstPeriodDays * dailyRate;
+
+            decimal secondPeriodPremium = secondPeriodDays * dailyRate * (1 - GetSecondPeriodDiscount(coverType));
+
+            decimal thirdPeriodPremium = thirdPeriodDays * dailyRate * (1 - GetThirdPeriodDiscount(coverType));
+
+            return firstPeriodPremium + secondPeriodPremium + thirdPeriodPremium;
+        }
+        private decimal GetTypeMultiplier(CoverType coverType)
+        {
+            return coverType switch
             {
-                CoverType.Yacht => 1.1m,
-                CoverType.PassengerShip => 1.2m,
-                CoverType.Tanker => 1.5m,
-                _ => 1.3m
+                CoverType.Yacht => 1.10m,
+                CoverType.PassengerShip => 1.20m,
+                CoverType.Tanker => 1.50m,
+                _ => 1.30m  // Covers CoverType.Other
             };
+        }
 
-            var premiumPerDay = 1250 * multiplier;
-            var insuranceLength = (endDate - startDate).TotalDays;
-            var totalPremium = 0m;
+        private decimal GetSecondPeriodDiscount(CoverType coverType)
+        {
+            return coverType == CoverType.Yacht ? 0.05m : 0.02m; // 150 days are discounted by 5% for Yacht and by 2% for other types
+        }
 
-            for (var i = 0; i < insuranceLength; i++)
-            {
-                if (i < 30)
-                    totalPremium += premiumPerDay;
-                else if (i < 180)
-                    totalPremium += coverType == CoverType.Yacht
-                        ? premiumPerDay * 0.95m
-                        : premiumPerDay * 0.98m;
-                else
-                    totalPremium += coverType == CoverType.Yacht
-                        ? premiumPerDay * 0.92m
-                        : premiumPerDay * 0.97m;
-            }
+        private decimal GetThirdPeriodDiscount(CoverType coverType)
+        {
+            return coverType == CoverType.Yacht ? 0.08m : 0.03m; // Remaining days are discounted by additional 3% for Yacht and by 1% for other types
 
-            return totalPremium;
         }
     }
 }

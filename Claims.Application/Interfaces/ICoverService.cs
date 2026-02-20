@@ -30,6 +30,6 @@ namespace Claims.Application.Interfaces
         /// <summary>
         /// Calculates premium based on duration and cover type.
         /// </summary>
-        decimal ComputePremium(DateTime startDate, DateTime endDate, CoverType coverType);
+        decimal ComputePremium(CoverType coverType,int insuranceDays);
     }
 }

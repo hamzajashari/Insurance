@@ -26,7 +26,16 @@ public class CoversController : ControllerBase
     /// <returns>Calculated premium.</returns>
     [HttpPost("compute")]
     public ActionResult ComputePremium(DateTime startDate, DateTime endDate, CoverType coverType)
-        => Ok(_coverService.ComputePremium(startDate, endDate, coverType));
+    {
+        if (endDate < startDate)
+            return BadRequest("End date must be after start date.");
+
+        // Calculate insurance days (inclusive)
+        int insuranceDays = (endDate.Date - startDate.Date).Days + 1; 
+        decimal premium = _coverService.ComputePremium(coverType, insuranceDays);
+
+        return Ok(premium);
+    }
 
     /// <summary>
     /// Retrieves all covers.
