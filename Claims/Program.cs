@@ -1,9 +1,12 @@
+using Claims.Application.Events;
 using Claims.Application.Interfaces;
 using Claims.Application.Services;
 using Claims.Controllers;
 using Claims.Infrastructure.DbContexts;
+using Claims.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
+using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 using Testcontainers.MongoDb;
@@ -44,10 +47,12 @@ builder.Services.AddDbContext<ClaimsContext>(options =>
     options.UseMongoDB(database.Client, database.DatabaseNamespace.DatabaseName);
 });
 
-
+builder.Services.AddScoped<IClaimRepository, ClaimRepository>();
 builder.Services.AddScoped<IClaimService, ClaimService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<ICoverService, CoverService>();
+
+builder.Services.AddSingleton<ConcurrentQueue<AuditEvent>>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

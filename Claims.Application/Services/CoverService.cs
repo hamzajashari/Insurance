@@ -1,8 +1,10 @@
-﻿using Claims.Application.Interfaces;
+﻿using Claims.Application.Events;
+using Claims.Application.Interfaces;
 using Claims.Domain;
 using Claims.Infrastructure.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 
 namespace Claims.Application.Services
 {
@@ -52,7 +54,7 @@ namespace Claims.Application.Services
             _claimsContext.Covers.Add(cover);
             await _claimsContext.SaveChangesAsync();
 
-            await _auditService.AuditCoverAsync(cover.Id, "POST");
+            _auditService.Enqueue(new AuditEvent { ClaimId = cover.Id, HttpRequestType = "POST" });
 
             _logger.LogInformation("Cover created with ID {Id}", cover.Id);
 
@@ -67,7 +69,7 @@ namespace Claims.Application.Services
             _claimsContext.Covers.Remove(cover);
             await _claimsContext.SaveChangesAsync();
 
-            await _auditService.AuditCoverAsync(id, "DELETE");
+            _auditService.Enqueue(new AuditEvent { CoverId = id, HttpRequestType = "DELETE" });
 
             _logger.LogInformation("Cover deleted with ID {Id}", id);
         }

@@ -12,18 +12,18 @@ namespace Claims.Application.Services
     /// </summary>
     public class ClaimService : IClaimService
     {
-        private readonly ClaimsContext _claimsContext;
+        private readonly IClaimRepository _claimRepository;
         private readonly IAuditService _auditService;
         private readonly ICoverService _coverService;
         private readonly ILogger<ClaimService> _logger;
 
         public ClaimService(
-            ClaimsContext claimsContext,
+            IClaimRepository claimRepository,
             IAuditService auditService,
             ICoverService coverService,
             ILogger<ClaimService> logger)
         {
-            _claimsContext = claimsContext;
+            _claimRepository = claimRepository;
             _auditService = auditService;
             _coverService = coverService;
             _logger = logger;
@@ -31,12 +31,12 @@ namespace Claims.Application.Services
 
         public async Task<IEnumerable<Claim>> GetAllAsync()
         {
-            return await _claimsContext.GetClaimsAsync();
+            return await _claimRepository.GetAllAsync();
         }
 
         public async Task<Claim?> GetByIdAsync(string id)
         {
-            return await _claimsContext.GetClaimAsync(id);
+            return await _claimRepository.GetByIdAsync(id);
         }
 
         public async Task<Claim> CreateAsync(Claim claim)
@@ -55,7 +55,7 @@ namespace Claims.Application.Services
 
             claim.Id = Guid.NewGuid().ToString();
 
-            await _claimsContext.AddItemAsync(claim);
+            await _claimRepository.AddAsync(claim);
 
             _auditService.Enqueue(new AuditEvent { ClaimId = claim.Id, HttpRequestType = "POST" });
 
@@ -68,7 +68,7 @@ namespace Claims.Application.Services
         {
             _auditService.Enqueue(new AuditEvent { ClaimId = id, HttpRequestType = "DELETE" });
 
-            await _claimsContext.DeleteItemAsync(id);
+            await _claimRepository.DeleteAsync(id);
 
             _logger.LogInformation("Claim deleted with ID {Id}", id);
         }
