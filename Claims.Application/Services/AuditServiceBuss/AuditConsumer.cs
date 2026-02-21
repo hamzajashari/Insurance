@@ -21,7 +21,9 @@ namespace Claims.Application.Services.AuditServiceBuss
         {
             _provider = provider;
 
-            var queueName = config["ServiceBus:QueueName"];
+            //var queueName = config["ServiceBus:QueueName"];
+
+            var queueName = Environment.GetEnvironmentVariable("QueueName");
 
             _processor = client.CreateProcessor(queueName);
 

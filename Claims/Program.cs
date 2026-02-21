@@ -59,7 +59,8 @@ builder.Services.AddScoped<ICoverService, CoverService>();
 builder.Services.AddSingleton(sp =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
-    var connectionString = config["ServiceBus:ConnectionString"];
+    //var connectionString = config["ServiceBus:ConnectionString"];
+    var connectionString = Environment.GetEnvironmentVariable("ConnectionString");
 
     return new ServiceBusClient(connectionString);
 });
