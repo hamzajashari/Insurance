@@ -35,7 +35,7 @@ namespace Claims.Tests
         {
             var repoMock = new Mock<IClaimRepository>().Object;
             var coverServiceMock = new Mock<ICoverService>().Object;
-            var auditMock = new Mock<IAuditService>().Object;
+            var auditMock = new Mock<IAuditProducerService>().Object;
             var loggerMock = new Mock<ILogger<ClaimService>>().Object;
 
             var service = new ClaimService(
@@ -59,7 +59,7 @@ namespace Claims.Tests
             var repoMock = new Mock<IClaimRepository>().Object;
             var coverServiceMock = new Mock<ICoverService>();
             var loggerMock = new Mock<ILogger<ClaimService>>().Object;
-            var auditMock = new Mock<IAuditService>().Object;
+            var auditMock = new Mock<IAuditProducerService>().Object;
 
             coverServiceMock
                 .Setup(x => x.GetByIdAsync(It.IsAny<string>()))
@@ -91,7 +91,7 @@ namespace Claims.Tests
         {
             var repoMock = new Mock<IClaimRepository>();
             var coverServiceMock = new Mock<ICoverService>();
-            var auditMock = new Mock<IAuditService>();
+            var auditMock = new Mock<IAuditProducerService>();
             var loggerMock = new Mock<ILogger<ClaimService>>().Object;
 
             coverServiceMock
@@ -118,7 +118,7 @@ namespace Claims.Tests
             await service.CreateAsync(claim);
 
             repoMock.Verify(x => x.AddAsync(It.IsAny<Claim>()), Times.Once);
-            auditMock.Verify(x => x.Enqueue(It.IsAny<AuditEvent>()), Times.Once);
+            auditMock.Verify(x => x.EnqueueAsync(It.IsAny<AuditEvent>()), Times.Once);
         }
     }
 }
