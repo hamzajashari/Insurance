@@ -2,6 +2,7 @@
 using Claims.Application.Interfaces;
 using Claims.Domain;
 using Claims.Infrastructure.DbContexts;
+using Claims.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
@@ -10,31 +11,29 @@ namespace Claims.Application.Services
 {
     public class CoverService : ICoverService
     {
-        private readonly ClaimsContext _claimsContext;
+        private readonly ICoverRepository _coverRepository;
         private readonly IAuditProducerService _auditService;
         private readonly ILogger<CoverService> _logger;
 
         private const decimal BaseDayRate = 1250m;
         public CoverService(
-            ClaimsContext claimsContext,
+            ICoverRepository coverRepository,
             IAuditProducerService auditService,
             ILogger<CoverService> logger)
         {
-            _claimsContext = claimsContext;
+            _coverRepository = coverRepository;
             _auditService = auditService;
             _logger = logger;
         }
 
         public async Task<IEnumerable<Cover>> GetAllAsync()
         {
-            return await _claimsContext.Covers.ToListAsync();
+            return await _coverRepository.GetAllAsync();
         }
 
         public async Task<Cover?> GetByIdAsync(string id)
         {
-            return await _claimsContext.Covers
-                .Where(c => c.Id == id)
-                .SingleOrDefaultAsync();
+            return await _coverRepository.GetByIdAsync(id);
         }
 
         public async Task<Cover> CreateAsync(Cover cover)
@@ -57,8 +56,7 @@ namespace Claims.Application.Services
 
             cover.Premium = ComputePremium(cover.Type, days);
 
-            _claimsContext.Covers.Add(cover);
-            await _claimsContext.SaveChangesAsync();
+            await _coverRepository.AddAsync(cover);
 
             await _auditService.EnqueueAsync(new AuditEvent { ClaimId = cover.Id, HttpRequestType = "POST" });
 
@@ -72,8 +70,7 @@ namespace Claims.Application.Services
             var cover = await GetByIdAsync(id);
             if (cover is null) return;
 
-            _claimsContext.Covers.Remove(cover);
-            await _claimsContext.SaveChangesAsync();
+            await _coverRepository.DeleteAsync(id);
 
             await _auditService.EnqueueAsync(new AuditEvent { CoverId = id, HttpRequestType = "DELETE" });
 
