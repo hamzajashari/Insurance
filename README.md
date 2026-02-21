@@ -1,149 +1,182 @@
-# 📘 Insurance Claims API
+# Claims Insurance API
 
-## Architecture Documentation
+## Overview
 
-------------------------------------------------------------------------
+Claims Insurance API is a production-ready ASP.NET Core Web API that
+manages:
 
-## 📌 Overview
+-   Claims
+-   Covers
+-   Audit events
 
-This project implements an **Insurance Claims Management API** using a
-clean, layered architecture.
+The application follows Clean Architecture principles with clear
+separation of concerns:
 
-The codebase was refactored to:
+-   Domain Layer
+-   Application Layer (Services & Interfaces)
+-   Infrastructure Layer
+-   API Layer
 
--   Reduce controller responsibilities
--   Introduce proper layering
--   Follow **SOLID principles**
--   Improve maintainability and testability
--   Add XML documentation
-
-------------------------------------------------------------------------
-
-# 🏗 Architecture
-
-The solution follows a **Layered Architecture**:
-
-    Claims.API
-    Claims.Application
-    Claims.Infrastructure
-    Claims.Domain
+It integrates Azure Service Bus for asynchronous audit processing and
+background message handling.
 
 ------------------------------------------------------------------------
 
-## 🔹 Claims.API
+## Architecture
 
-### Responsibility
+### Design Principles
 
-Handles HTTP requests and responses.
-
-### Contains
-
--   Controllers
--   Swagger configuration
--   Dependency Injection setup
-
-### Rules
-
--   No business logic
--   No database logic
--   Depends only on Application layer
+-   Controllers contain no business logic
+-   Services encapsulate business rules
+-   Repository pattern abstracts data access
+-   Background services handle asynchronous processing
+-   Enum-based domain modeling prevents string-based bugs
+-   Dependency Injection ensures loose coupling and testability
 
 ------------------------------------------------------------------------
 
-## 🔹 Claims.Application
+## Technology Stack
 
-### Responsibility
-
-Contains business logic and orchestration.
-
-### Contains
-
--   Service interfaces (IClaimService, ICoverService, IAuditService)
--   Service implementations
--   Premium calculation logic
--   Validation rules
-
-### Rules
-
--   Depends only on Claims.Domain
--   Uses abstractions for Infrastructure communication
+-   .NET 9+
+-   ASP.NET Core Web API
+-   Entity Framework Core
+-   MongoDB (Audit storage if applicable)
+-   Azure Service Bus
+-   Docker
 
 ------------------------------------------------------------------------
 
-## 🔹 Claims.Infrastructure
+## Prerequisites
 
-### Responsibility
+### 1. Install Visual Studio
 
-Handles persistence and external concerns.
+Include: - ASP.NET Core workload - .NET development tools
 
-### Contains
+### 2. Install .NET SDK
 
--   MongoDB contexts
--   SQL Server Audit context
--   Repository implementations
--   Audit implementation
+Verify installation:
 
-### Rules
+    dotnet --version
 
--   Implements interfaces defined in Application layer
--   Does not contain business logic
+If not recognized, add to PATH: C:`\Program `{=tex}Files`\dotnet`{=tex}\
 
-------------------------------------------------------------------------
+### 3. Install Docker Desktop
 
-## 🔹 Claims.Domain
-
-### Responsibility
-
-Core business entities and domain models.
-
-### Contains
-
--   Entities (Claim, Cover)
--   Enums
--   Domain-related structures
-
-### Rules
-
--   No dependencies on other layers
--   Pure business objects
+Used for containerized services (e.g., MongoDB).
 
 ------------------------------------------------------------------------
 
-# 🧠 SOLID Principles Applied
+## Installation & Setup
 
--   **Single Responsibility Principle**\
-    Each layer has a clearly defined responsibility.
+### Restore Dependencies
 
--   **Open/Closed Principle**\
-    Business logic can be extended without modifying controllers.
+    dotnet restore
 
--   **Liskov Substitution Principle**\
-    Services depend on abstractions and can be substituted.
+### Run Migrations (Audit Context)
 
--   **Interface Segregation Principle**\
-    Small, focused service interfaces are used.
+    Add-Migration InitialCreate -Context AuditContext
+    Update-Database -Context AuditContext
 
--   **Dependency Inversion Principle**\
-    High-level modules depend on abstractions, not concrete
-    implementations.
+### Run Application
 
-------------------------------------------------------------------------
+    dotnet run
 
-# 🗄 Persistence
+Swagger available at:
 
--   MongoDB is used for Claims and Covers.
--   SQL Server is used for auditing.
--   EF Core is used as ORM.
--   Testcontainers are used for testing environments.
+    https://localhost:{port}/swagger
 
 ------------------------------------------------------------------------
 
-# ✅ Result
+## Premium Computation Logic
 
-The application is now:
+### Base Rate
 
--   Structured
--   Maintainable
--   Testable
--   Layered
--   SOLID-compliant
+1250 per day
+
+### Type Multipliers
+
+-   Yacht: +10%
+-   PassengerShip: +20%
+-   Tanker: +50%
+-   Other: +30%
+
+### Progressive Discounts
+
+-   First 30 days: no discount
+-   Next 150 days:
+    -   Yacht: -5%
+    -   Others: -2%
+-   Remaining days:
+    -   Yacht: -8% total discount
+    -   Others: -3% total discount
+
+### Example Response
+
+{ "id": "5d1b4ff9-87d0-46f2-8692-1e934ba38d55", "startDate":
+"2026-02-21T00:59:30.573Z", "endDate": "2026-03-21T00:59:30.573Z",
+"type": "Yacht", "premium": 38500 }
+
+------------------------------------------------------------------------
+
+## Azure Service Bus Integration
+
+### NuGet Package
+
+    dotnet add package Azure.Messaging.ServiceBus
+
+### Azure Resources
+
+Resource Group: claims-app-rg
+
+Service Bus Namespace: claimsservicebus
+
+Queue: audit-events
+
+### Background Worker
+
+A hosted background service listens to the `audit-events` queue and:
+
+-   Processes audit messages
+-   Persists audit records
+-   Logs results
+-   Ensures reliable asynchronous processing
+
+------------------------------------------------------------------------
+
+## Refactoring & Improvements
+
+-   Removed direct DbContext usage from controllers
+-   Introduced service layer abstractions
+-   Implemented repository pattern
+-   Added XML documentation for public APIs
+-   Implemented enum-safe premium calculation
+-   Improved dependency injection configuration
+
+------------------------------------------------------------------------
+
+## Production Considerations
+
+Recommended future improvements:
+
+-   API Management Layer
+-   Health Checks
+-   Structured Logging (Serilog)
+-   Retry Policies for Service Bus
+-   CI/CD Pipeline
+-   Containerized Deployment
+-   Application Insights integration
+-   Rate limiting and authentication
+
+------------------------------------------------------------------------
+
+## Running with Docker (Optional)
+
+Build image:
+
+    docker build -t claims-api .
+
+Run container:
+
+    docker run -p 5000:80 claims-api
+
+------------------------------------------------------------------------
