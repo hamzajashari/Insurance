@@ -11,13 +11,13 @@ namespace Claims.Application.Services
     public class CoverService : ICoverService
     {
         private readonly ClaimsContext _claimsContext;
-        private readonly IAuditService _auditService;
+        private readonly IAuditProducerService _auditService;
         private readonly ILogger<CoverService> _logger;
 
         private const decimal BaseDayRate = 1250m;
         public CoverService(
             ClaimsContext claimsContext,
-            IAuditService auditService,
+            IAuditProducerService auditService,
             ILogger<CoverService> logger)
         {
             _claimsContext = claimsContext;
@@ -60,7 +60,7 @@ namespace Claims.Application.Services
             _claimsContext.Covers.Add(cover);
             await _claimsContext.SaveChangesAsync();
 
-            _auditService.Enqueue(new AuditEvent { ClaimId = cover.Id, HttpRequestType = "POST" });
+            await _auditService.EnqueueAsync(new AuditEvent { ClaimId = cover.Id, HttpRequestType = "POST" });
 
             _logger.LogInformation("Cover created with ID {Id}", cover.Id);
 
@@ -75,7 +75,7 @@ namespace Claims.Application.Services
             _claimsContext.Covers.Remove(cover);
             await _claimsContext.SaveChangesAsync();
 
-            _auditService.Enqueue(new AuditEvent { CoverId = id, HttpRequestType = "DELETE" });
+            await _auditService.EnqueueAsync(new AuditEvent { CoverId = id, HttpRequestType = "DELETE" });
 
             _logger.LogInformation("Cover deleted with ID {Id}", id);
         }

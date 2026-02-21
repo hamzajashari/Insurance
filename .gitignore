@@ -12,6 +12,9 @@ CHECKLIST.md
 .vscode/
 Insify.War.Terms.Api/appsettings.override.json
 
+#ServiceBus !
+appsettings.Development.json
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 *_log.txt

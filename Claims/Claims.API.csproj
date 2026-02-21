@@ -12,6 +12,7 @@
 </ItemGroup>
 	
   <ItemGroup>
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.20.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.1" />
     <PackageReference Include="Testcontainers.MongoDb" Version="4.6.0" />
     <PackageReference Include="Testcontainers.MsSql" Version="4.6.0" />

@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Claims.Application.Services
+namespace Claims.Application.Services.InMemoryQueue
 {
     public class AuditService : IAuditService
     {

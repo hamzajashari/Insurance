@@ -1,6 +1,9 @@
+using Azure.Messaging.ServiceBus;
 using Claims.Application.Events;
 using Claims.Application.Interfaces;
 using Claims.Application.Services;
+using Claims.Application.Services.AuditServiceBuss;
+using Claims.Application.Services.InMemoryQueue;
 using Claims.Controllers;
 using Claims.Infrastructure.DbContexts;
 using Claims.Infrastructure.Repositories;
@@ -51,8 +54,22 @@ builder.Services.AddScoped<IClaimRepository, ClaimRepository>();
 builder.Services.AddScoped<IClaimService, ClaimService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<ICoverService, CoverService>();
-
 builder.Services.AddSingleton<ConcurrentQueue<AuditEvent>>();
+
+builder.Services.AddSingleton(sp =>
+{
+    var config = sp.GetRequiredService<IConfiguration>();
+    var connectionString = config["ServiceBus:ConnectionString"];
+
+    return new ServiceBusClient(connectionString);
+});
+builder.Services.AddScoped<IAuditProducerService, AuditProducer>();
+builder.Services.AddHostedService<AuditConsumer>();
+//<summary>
+//If I wanted to use in-memory queue instead of Azure ServiceBus,
+//I could uncomment the line below and inject ConcurrentQueue<AuditEvent> into AuditBackgroundService and AuditProducer
+//</summary>
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
