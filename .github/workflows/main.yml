@@ -8,7 +8,9 @@ on:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
-
+    environment: production
+    env:
+      ConnectionString: ${{ secrets.ConnectionString }}
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET 9
