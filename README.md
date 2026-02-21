@@ -112,9 +112,15 @@ Swagger available at:
 
 ### Example Response
 
-{ "id": "5d1b4ff9-87d0-46f2-8692-1e934ba38d55", "startDate":
-"2026-02-21T00:59:30.573Z", "endDate": "2026-03-21T00:59:30.573Z",
-"type": "Yacht", "premium": 38500 }
+```json
+{
+    "id": "5d1b4ff9-87d0-46f2-8692-1e934ba38d55",
+    "startDate": "2026-02-21T00:59:30.573Z",
+    "endDate": "2026-03-21T00:59:30.573Z",
+    "type": "Yacht",
+    "premium": 38500
+}
+```
 
 ------------------------------------------------------------------------
 
@@ -178,5 +184,19 @@ Build image:
 Run container:
 
     docker run -p 5000:80 claims-api
+
+------------------------------------------------------------------------
+
+## 🚀 CI Pipeline
+
+A GitHub Actions workflow runs on every push to main:
+
+-   Build (.NET 9)
+
+-   Run tests
+
+-   Publish artifacts
+
+All changes must pass the pipeline before being considered stable.
 
 ------------------------------------------------------------------------
