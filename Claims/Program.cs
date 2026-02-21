@@ -60,7 +60,7 @@ builder.Services.AddSingleton(sp =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
     //var connectionString = config["ServiceBus:ConnectionString"];
-    var connectionString = Environment.GetEnvironmentVariable("ConnectionString");
+    var connectionString = Environment.GetEnvironmentVariable("CONNECTIONSTRING");
 
     return new ServiceBusClient(connectionString);
 });

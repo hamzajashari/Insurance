@@ -13,7 +13,7 @@ namespace Claims.Application.Services.AuditServiceBuss
         public AuditProducer(ServiceBusClient client, IConfiguration config)
         {
             //var queueName = config["ServiceBus:QueueName"];
-            var queueName = Environment.GetEnvironmentVariable("QueueName");
+            var queueName = Environment.GetEnvironmentVariable("QUEUENAME");
             _sender = client.CreateSender(queueName);
         }
 
