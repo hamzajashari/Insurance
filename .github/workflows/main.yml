@@ -3,7 +3,7 @@ name: Deploy .NET 9 API with Swagger
 on:
   push:
     branches:
-      - feature/env-sercret # Trigger on pushes to the main branch
+      - main # Trigger on pushes to the main branch
 
 jobs:
   build-and-publish:
