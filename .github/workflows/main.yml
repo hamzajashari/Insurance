@@ -11,6 +11,7 @@ jobs:
     environment: Production
     env:
       CONNECTIONSTRING: ${{ secrets.CONNECTIONSTRING }}
+      QUEUENAME: ${{ secrets.QUEUENAME }}
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET 9
