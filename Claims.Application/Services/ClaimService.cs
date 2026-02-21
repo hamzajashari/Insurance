@@ -13,13 +13,13 @@ namespace Claims.Application.Services
     public class ClaimService : IClaimService
     {
         private readonly IClaimRepository _claimRepository;
-        private readonly IAuditService _auditService;
+        private readonly IAuditProducerService _auditService;
         private readonly ICoverService _coverService;
         private readonly ILogger<ClaimService> _logger;
 
         public ClaimService(
             IClaimRepository claimRepository,
-            IAuditService auditService,
+            IAuditProducerService auditService,
             ICoverService coverService,
             ILogger<ClaimService> logger)
         {
@@ -57,7 +57,7 @@ namespace Claims.Application.Services
 
             await _claimRepository.AddAsync(claim);
 
-            _auditService.Enqueue(new AuditEvent { ClaimId = claim.Id, HttpRequestType = "POST" });
+            await _auditService.EnqueueAsync(new AuditEvent { ClaimId = claim.Id, HttpRequestType = "POST" });
 
             _logger.LogInformation("Claim created with ID {Id}", claim.Id);
 
@@ -66,7 +66,7 @@ namespace Claims.Application.Services
 
         public async Task DeleteAsync(string id)
         {
-            _auditService.Enqueue(new AuditEvent { ClaimId = id, HttpRequestType = "DELETE" });
+            await _auditService.EnqueueAsync(new AuditEvent { ClaimId = id, HttpRequestType = "DELETE" });
 
             await _claimRepository.DeleteAsync(id);
 
