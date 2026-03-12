@@ -4,7 +4,7 @@ A .NET 9 REST API for managing insurance covers and claims, with a React fronten
 
 ---
 
-![Insurance](Insurance.png)
+![Insurance](insurance.jpg)
 
 ## Prerequisites
 
