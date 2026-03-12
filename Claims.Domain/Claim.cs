@@ -9,7 +9,7 @@ namespace Claims.Domain
     public class Claim
     {
         [BsonId]
-        public string Id { get; set; }
+        public string? Id { get; set; }
 
         [BsonElement("coverId")]
         public string CoverId { get; set; }

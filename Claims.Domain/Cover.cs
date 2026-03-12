@@ -8,7 +8,7 @@ namespace Claims;
 public class Cover
 {
     [BsonId]
-    public string Id { get; set; }
+    public string? Id { get; set; }
 
     [BsonElement("startDate")]
     public DateTime StartDate { get; set; }

@@ -1,202 +1,54 @@
-# Claims Insurance API
+# Insurance Claims API
 
-## Overview
+A .NET 9 REST API for managing insurance covers and claims, with a React frontend and async audit processing.
 
-Claims Insurance API is a production-ready ASP.NET Core Web API that
-manages:
+---
 
--   Claims
--   Covers
--   Audit events
-
-The application follows Clean Architecture principles with clear
-separation of concerns:
-
--   Domain Layer
--   Application Layer (Services & Interfaces)
--   Infrastructure Layer
--   API Layer
-
-It integrates Azure Service Bus for asynchronous audit processing and
-background message handling.
-
-------------------------------------------------------------------------
-
-## Architecture
-
-### Design Principles
-
--   Controllers contain no business logic
--   Services encapsulate business rules
--   Repository pattern abstracts data access
--   Background services handle asynchronous processing
--   Enum-based domain modeling prevents string-based bugs
--   Dependency Injection ensures loose coupling and testability
-
-------------------------------------------------------------------------
-
-## Technology Stack
-
--   .NET 9+
--   ASP.NET Core Web API
--   Entity Framework Core
--   MongoDB (Audit storage if applicable)
--   Azure Service Bus
--   Docker
-
-------------------------------------------------------------------------
+![Insurance](Insurance.png)
 
 ## Prerequisites
 
-### 1. Install Visual Studio
+- [.NET 9 SDK](https://dotnet.microsoft.com/download)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (for MongoDB via Testcontainers)
+- [Node.js 18+](https://nodejs.org/) (for the frontend)
 
-Include: - ASP.NET Core workload - .NET development tools
+---
 
-### 2. Install .NET SDK
+## Running the API
 
-Verify installation:
+- Start Docker Desktop
+- `cd` into the repo root
+- `dotnet run --project Claims/Claims.API.csproj`
+- API available at `http://localhost:5000`
+- Swagger UI at `http://localhost:5000/swagger`
 
-    dotnet --version
+## Running the Frontend
 
-If not recognized, add to PATH: C:`\Program `{=tex}Files`\dotnet`{=tex}\
+- `cd frontend`
+- `npm install`
+- `npm run dev`
+- Open `http://localhost:3000`
 
-### 3. Install Docker Desktop
+## Running Tests
 
-Used for containerized services (e.g., MongoDB).
-
-------------------------------------------------------------------------
-
-## Installation & Setup
-
-### Restore Dependencies
-
-    dotnet restore
-
-### Run Migrations (Audit Context)
-
-    Add-Migration InitialCreate -Context AuditContext
-    Update-Database -Context AuditContext
-
-### Run Application
-
-    dotnet run
-
-Swagger available at:
-
-    https://localhost:{port}/swagger
-
-------------------------------------------------------------------------
-
-## Premium Computation Logic
-
-### Base Rate
-
-1250 per day
-
-### Type Multipliers
-
--   Yacht: +10%
--   PassengerShip: +20%
--   Tanker: +50%
--   Other: +30%
-
-### Progressive Discounts
-
--   First 30 days: no discount
--   Next 150 days:
-    -   Yacht: -5%
-    -   Others: -2%
--   Remaining days:
-    -   Yacht: -8% total discount
-    -   Others: -3% total discount
-
-### Example Response
-
-```json
-{
-    "id": "5d1b4ff9-87d0-46f2-8692-1e934ba38d55",
-    "startDate": "2026-02-21T00:59:30.573Z",
-    "endDate": "2026-03-21T00:59:30.573Z",
-    "type": "Yacht",
-    "premium": 38500
-}
+```bash
+dotnet test Claims.Tests/Claims.Tests.csproj
 ```
 
-------------------------------------------------------------------------
+---
 
-## Azure Service Bus Integration
+## Azure Service Bus
 
-### NuGet Package
+The app supports Azure Service Bus for audit event processing as an alternative to the default in-memory queue.
 
-    dotnet add package Azure.Messaging.ServiceBus
+- Configure the connection string in `appsettings.json` under `ServiceBus:ConnectionString`
+- Queue name: `audit-events`
+- **The Azure subscription is active until 23 March 2026** — after that date the Service Bus resource will be unavailable and the app will fall back to the in-memory queue
 
-### Azure Resources
+---
 
-Resource Group: claims-app-rg
+## Stack
 
-Service Bus Namespace: claimsservicebus
-
-Queue: audit-events
-
-### Background Worker
-
-A hosted background service listens to the `audit-events` queue and:
-
--   Processes audit messages
--   Persists audit records
--   Logs results
--   Ensures reliable asynchronous processing
-
-------------------------------------------------------------------------
-
-## Refactoring & Improvements
-
--   Removed direct DbContext usage from controllers
--   Introduced service layer abstractions
--   Implemented repository pattern
--   Added XML documentation for public APIs
--   Implemented enum-safe premium calculation
--   Improved dependency injection configuration
-
-------------------------------------------------------------------------
-
-## Production Considerations
-
-Recommended future improvements:
-
--   API Management Layer
--   Health Checks
--   Structured Logging (Serilog)
--   Retry Policies for Service Bus
--   CI/CD Pipeline
--   Containerized Deployment
--   Application Insights integration
--   Rate limiting and authentication
-
-------------------------------------------------------------------------
-
-## Running with Docker (Optional)
-
-Build image:
-
-    docker build -t claims-api .
-
-Run container:
-
-    docker run -p 5000:80 claims-api
-
-------------------------------------------------------------------------
-
-## 🚀 CI Pipeline
-
-A GitHub Actions workflow runs on every push to main:
-
--   Build (.NET 9)
-
--   Run tests
-
--   Publish artifacts
-
-All changes must pass the pipeline before being considered stable.
-
-------------------------------------------------------------------------
+- **API** — ASP.NET Core 9, MongoDB (Testcontainers), in-memory audit queue
+- **Frontend** — React, TypeScript, Vite, Tailwind CSS
+- **Tests** — xUnit, Moq

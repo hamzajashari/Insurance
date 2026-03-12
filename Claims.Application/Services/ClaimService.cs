@@ -50,7 +50,7 @@ namespace Claims.Application.Services
             if (cover == null)
                 throw new ArgumentException("Related cover not found");
 
-            if (claim.Created < cover.StartDate || claim.Created > cover.EndDate)
+            if (claim.Created.Date < cover.StartDate.Date || claim.Created.Date > cover.EndDate.Date)
                 throw new ArgumentException("Claim date must be within the cover period");
 
             claim.Id = Guid.NewGuid().ToString();

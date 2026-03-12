@@ -1,8 +1,8 @@
 ﻿using Claims.Application.Interfaces;
 using Claims.Infrastructure.DbContexts;
-using MongoDB.Driver.Linq;
 using System;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;

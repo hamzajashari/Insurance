@@ -44,8 +44,15 @@ namespace Claims.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateAsync(Claim claim)
         {
-            var created = await _claimService.CreateAsync(claim);
-            return Ok(created);
+            try
+            {
+                var created = await _claimService.CreateAsync(claim);
+                return Ok(created);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
         /// <summary>
         /// Deletes a claim by its identifier.

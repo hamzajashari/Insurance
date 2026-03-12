@@ -44,12 +44,14 @@ builder.Services
 builder.Services.AddDbContext<AuditContext>(options =>
     options.UseSqlServer(sqlContainer.GetConnectionString()));
 
+// Create MongoClient once — reusing it avoids EF Core building a new
+// internal service provider on every request (ManyServiceProvidersCreatedWarning).
+var mongoClient = new MongoClient(mongoContainer.GetConnectionString());
+var mongoDbName = builder.Configuration["MongoDb:DatabaseName"]!;
+
+builder.Services.AddSingleton<IMongoClient>(mongoClient);
 builder.Services.AddDbContext<ClaimsContext>(options =>
-{
-    var client = new MongoClient(mongoContainer.GetConnectionString());
-    var database = client.GetDatabase(builder.Configuration["MongoDb:DatabaseName"]); // Use a default/test database name
-    options.UseMongoDB(database.Client, database.DatabaseNamespace.DatabaseName);
-});
+    options.UseMongoDB(mongoClient, mongoDbName));
 
 builder.Services.AddScoped<IClaimRepository, ClaimRepository>();
 builder.Services.AddScoped<ICoverRepository, CoverRepository>();
@@ -59,8 +61,8 @@ builder.Services.AddScoped<ICoverService, CoverService>();
 builder.Services.AddSingleton(sp =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
-    //var connectionString = config["ServiceBus:ConnectionString"];
-    var connectionString = Environment.GetEnvironmentVariable("CONNECTIONSTRING");
+    var connectionString = config["ServiceBus:CONNECTIONSTRING"];
+    //var connectionString = Environment.GetEnvironmentVariable("CONNECTIONSTRING");
 
     return new ServiceBusClient(connectionString);
 });
@@ -73,6 +75,8 @@ builder.Services.AddHostedService<AuditConsumer>();
 //builder.Services.AddScoped<IAuditService, AuditService>();
 //builder.Services.AddSingleton<ConcurrentQueue<AuditEvent>>();
 
+builder.Services.AddCors(options =>
+    options.AddDefaultPolicy(p => p.WithOrigins("http://localhost:3000").AllowAnyHeader().AllowAnyMethod()));
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -88,6 +92,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors();
 
 app.UseAuthorization();
 
